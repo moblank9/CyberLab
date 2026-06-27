@@ -1,75 +1,108 @@
-# CyberLab
-This is the start of a cybersecurity portfolio on GitHub, I created a documentation structure that demonstrates planning, architecture, security considerations, and operational procedures.
+# Enterprise Styled Cybersecurity Home Lab
 
-# Cybersecurity Home Lab Portfolio
+A self-built "cyber range" simulating an enterprise network — used to practice
+penetration testing, system administration, SIEM detection engineering, and
+threat hunting in a fully isolated, segmented environment.
 
-## Overview
+## Architecture
 
-This repository documents the design, implementation, and operation of a personal cybersecurity laboratory built using Oracle VirtualBox.
+![Network Diagram](Diagrams/network-architecture.png)
 
-The purpose of this lab is to develop hands-on cybersecurity skills in:
+```
+                           Home Network
+                               │
+                     Ubuntu Host (Laptop 1)
+                               │
+                     VirtualBox Hypervisor
+                               │
+                    Management Network
+                               │
+                       pfSense Firewall
+                               │
+         ┌───────────────┬───────────────┬───────────────┐
+         │               │               │
+      DMZ Network     Internal LAN    SOC Network
+   192.168.20.x      192.168.10.x    192.168.30.x
+```
 
-- Security Monitoring
-- Threat Detection
-- Vulnerability Assessment
-- Incident Response
-- Digital Forensics
-- Network Security
-- Ethical Hacking
-- Security Operations (SOC)
+- **pfSense** firewall segments traffic between three zones
+- **Internal LAN** (192.168.10.x) — Windows 10/11, Ubuntu, Active Directory, File Server
+- **DMZ** (192.168.20.x) — OWASP Juice Shop, DVWA, Metasploitable
+- **SOC Network** (192.168.30.x) — Wazuh SIEM, TheHive, Velociraptor
 
-The environment is completely isolated from the host operating system and external networks, providing a safe platform for security experimentation and attack simulations.
+Attack traffic only ever flows into the DMZ. The SOC network is monitoring-only
+and should never originate offensive traffic — this should mirror how real
+organizations isolate detection infrastructure from production systems.
 
-## Hardware Specifications
+## Tech Stack
 
-| Component | Specification |
-|------------|--------------|
-| CPU | Intel Core i5 6th Generation |
-| RAM | 16GB DDR4 |
-| Virtualization | Oracle VirtualBox |
-| Storage | SSD Recommended |
-| Host OS | Windows 10/11 |
+| Category | Tools |
+|---|---|
+| Virtualization | VirtualBox |
+| Firewall / Networking | pfSense |
+| Identity | Active Directory, Group Policy |
+| SIEM | Wazuh, Elastic / OpenSearch |
+| Offensive Security | Kali, Nmap, Gobuster, Hydra, Burp Suite, Metasploit, Netcat |
+| Incident Response / Forensics | TheHive, Velociraptor |
+| Automation | Python, Bash |
+| Vulnerable Targets | OWASP Juice Shop, DVWA, Metasploitable |
 
-## Virtual Machines
+## Hardware Layout
 
-### Kali Linux
-Purpose:
-- Penetration Testing
-- Vulnerability Assessment
-- Attack Simulation
+| Host | OS | Role |
+|---|---|---|
+| Laptop 1 | Ubuntu Desktop LTS | Main workstation, VirtualBox host, pentesting, dev |
+| Laptop 2 | Ubuntu Server LTS | Dedicated SOC — Wazuh, Security Onion, TheHive, Velociraptor |
 
-### Windows
-Purpose:
-- Attack Target
-- Log Collection
-- Security Monitoring
+## Repository Structure
 
-### Ubuntu Server
-Purpose:
-- Linux Target System
-- Service Hosting
-- Log Generation
+| Folder | Contents |
+|---|---|
+| [`01-Network-Design/`](01-Network-Design/) | Topology, IP scheme, segmentation rationale |
+| [`02-pfSense/`](02-pfSense/) | Firewall rules, NAT, DHCP/DNS configs |
+| [`03-Active-Directory/`](03-Active-Directory/) | Domain setup, OUs, GPOs |
+| [`04-Windows-Hardening/`](04-Windows-Hardening/) | CIS benchmarks applied, before/after |
+| [`05-Linux-Hardening/`](05-Linux-Hardening/) | SSH hardening, auditd, fail2ban |
+| [`06-Wazuh/`](06-Wazuh/) | SIEM deployment, agent configs, custom detection rules |
+| [`07-Threat-Hunting/`](07-Threat-Hunting/) | Investigation writeups, IOC hunts |
+| [`08-Penetration-Testing/`](08-Penetration-Testing/) | Attack chains, screenshots, findings |
+| [`09-Malware-Analysis/`](09-Malware-Analysis/) | Sandboxed sample teardown notes |
+| [`10-Automation/`](10-Automation/) | Python/Bash scripts for provisioning, log parsing, reporting |
+| [`Diagrams/`](Diagrams/) | Network and architecture diagrams |
+| [`Screenshots/`](Screenshots/) | Supporting screenshots referenced in writeups |
+| [`Reports/`](Reports/) | Polished writeups / incident reports |
 
-### Wazuh Server
-Purpose:
-- SIEM Platform
-- Log Aggregation
-- Security Monitoring
-- Alert Management
+## Project Goals
 
-## Network Design
+Built to develop hands-on skill in:
+- Network segmentation and firewall administration
+- Active Directory deployment and hardening
+- SIEM detection rule authoring
+- Offensive security techniques and their corresponding blue-team detections
+- Scripting for security automation
 
-The lab uses an isolated VirtualBox Internal Network.
+## Build Phases
 
-No internet access is available once the environment is deployed.
+- [x] Phase 1 — Foundation (host setup, VirtualBox, networks)
+- [ ] Phase 2 — Firewall (pfSense)
+- [ ] Phase 3 — Active Directory
+- [ ] Phase 4 — Linux Infrastructure
+- [ ] Phase 5 — SIEM (Wazuh)
+- [ ] Phase 6 — Offensive Security
+- [ ] Phase 7 — Detection Engineering
+- [ ] Phase 8 — Threat Hunting
+- [ ] Phase 9 — Automation
+- [ ] Phase 10 — Documentation Polish
 
-The host operating system cannot directly communicate with lab systems.
+## Sample Findings
 
-## Learning Objectives
+_Links to standout write-ups will go here as they're completed,:_
+- [Detecting Brute-Force RDP Attempts with Wazuh](Reports/)
+- [SQL Injection to Domain Compromise — Full Attack Chain](Reports/)
 
-- Build a Security Operations Center (SOC) lab
-- Configure Wazuh SIEM
-- Detect brute-force attacks
-- Perform vulnerability scans
-- Investigate security alerts
-- Create professional cybersecurity documentation
+## Disclaimer
+
+This lab is fully isolated and air-gapped from production networks. All
+testing is performed against intentionally vulnerable systems I own and
+control (OWASP Juice Shop, DVWA, Metasploitable). No techniques here are
+used against systems without explicit authorization.
